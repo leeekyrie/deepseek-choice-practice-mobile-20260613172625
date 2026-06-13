@@ -1,0 +1,1008 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="data:,">
+  <title>DeepSeek RD 选择题刷题</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f4f6f3;
+      --panel: #ffffff;
+      --subtle: #f9faf7;
+      --text: #20231f;
+      --muted: #66705f;
+      --line: #dde3d7;
+      --accent: #236b5a;
+      --accent-soft: #e8f4ef;
+      --warn: #a65f1f;
+      --bad: #b3261e;
+      --good: #1f7a4d;
+      --shadow: 0 16px 36px rgba(31, 38, 30, 0.08);
+      --radius: 8px;
+      --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--sans);
+      line-height: 1.55;
+    }
+
+    button, select, input {
+      font: inherit;
+    }
+
+    button, select {
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: #fff;
+      color: var(--text);
+      min-height: 38px;
+      padding: 0 12px;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    button:hover, select:hover {
+      border-color: #adbaaa;
+      background: #fbfcf9;
+    }
+
+    button.primary {
+      border-color: var(--accent);
+      background: var(--accent);
+      color: #fff;
+    }
+
+    button.danger {
+      border-color: #d8aaa5;
+      color: var(--bad);
+    }
+
+    button:disabled {
+      cursor: not-allowed;
+      opacity: 0.58;
+    }
+
+    .app {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 310px minmax(0, 1fr);
+    }
+
+    .sidebar {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow: auto;
+      border-right: 1px solid var(--line);
+      background: #edf1e9;
+      padding: 18px;
+    }
+
+    .main {
+      min-width: 0;
+      padding: 22px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    h1, h2, h3 {
+      letter-spacing: 0;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 20px;
+      line-height: 1.25;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      border: 1px solid #ccd8c8;
+      background: #f8faf5;
+      border-radius: 999px;
+      color: #3f4b3a;
+      font-size: 12px;
+      padding: 3px 8px;
+      white-space: nowrap;
+    }
+
+    .panel {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: rgba(255, 255, 255, 0.7);
+      padding: 12px;
+      margin-bottom: 12px;
+    }
+
+    .panel-title {
+      color: var(--muted);
+      font-size: 12px;
+      margin-bottom: 8px;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .stat {
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: var(--subtle);
+      padding: 8px;
+      min-height: 62px;
+    }
+
+    .stat strong {
+      display: block;
+      font-size: 20px;
+      line-height: 1.15;
+    }
+
+    .muted, .stat span {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .controls {
+      display: grid;
+      gap: 8px;
+    }
+
+    .control-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .category-list {
+      display: grid;
+      gap: 6px;
+    }
+
+    .category-chip {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: #fff;
+      padding: 8px 9px;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .category-chip.active {
+      border-color: var(--accent);
+      background: var(--accent-soft);
+      color: #174f40;
+      font-weight: 650;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: rgba(255, 255, 255, 0.94);
+      backdrop-filter: blur(10px);
+      box-shadow: var(--shadow);
+      padding: 14px 16px;
+      margin-bottom: 16px;
+    }
+
+    .topbar-main {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 14px;
+    }
+
+    .topbar h2 {
+      margin: 0;
+      font-size: 22px;
+    }
+
+    .progress {
+      margin-top: 12px;
+      height: 8px;
+      border-radius: 999px;
+      overflow: hidden;
+      background: #e1e7dc;
+    }
+
+    .progress span {
+      display: block;
+      height: 100%;
+      width: 0%;
+      background: var(--accent);
+      transition: width 180ms ease;
+    }
+
+    .question-card {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--panel);
+      box-shadow: 0 10px 28px rgba(31, 38, 30, 0.055);
+      overflow: hidden;
+    }
+
+    .question-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      border-bottom: 1px solid var(--line);
+      background: #fbfcf9;
+      padding: 15px 16px;
+    }
+
+    .question-head h3 {
+      margin: 4px 0 0;
+      font-size: 18px;
+      line-height: 1.55;
+    }
+
+    .question-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 8px;
+    }
+
+    .pill {
+      border: 1px solid #dce4d8;
+      border-radius: 999px;
+      background: #fff;
+      color: var(--muted);
+      font-size: 12px;
+      padding: 2px 8px;
+      white-space: nowrap;
+    }
+
+    .pill.done {
+      border-color: #8ab79f;
+      background: #edf8f1;
+      color: var(--good);
+      font-weight: 700;
+    }
+
+    .question-index {
+      min-width: 80px;
+      text-align: right;
+      font-family: var(--mono);
+      color: var(--muted);
+    }
+
+    .question-body {
+      padding: 16px;
+    }
+
+    .options {
+      display: grid;
+      gap: 8px;
+    }
+
+    .option {
+      display: grid;
+      grid-template-columns: 26px 1fr;
+      align-items: start;
+      gap: 9px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: #fff;
+      padding: 10px 12px;
+      cursor: pointer;
+    }
+
+    .option:hover {
+      border-color: #b7c3b2;
+      background: #fbfcf9;
+    }
+
+    .option input {
+      margin-top: 4px;
+    }
+
+    .option.correct {
+      border-color: #8ab79f;
+      background: #edf8f1;
+    }
+
+    .option.wrong {
+      border-color: #d7aaa4;
+      background: #fff0ee;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    .explanation {
+      display: none;
+      margin-top: 14px;
+      border: 1px solid #d8e2dc;
+      border-radius: 6px;
+      background: #f7fbf8;
+      padding: 12px;
+    }
+
+    .explanation.show {
+      display: block;
+    }
+
+    .explanation p {
+      margin: 8px 0 0;
+      line-height: 1.7;
+    }
+
+    .answer-line {
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .knowledge-title {
+      display: block;
+      margin: 8px 0 4px;
+      color: #174f40;
+      font-weight: 700;
+    }
+
+    .answer-line.good {
+      color: var(--good);
+    }
+
+    .answer-line.bad {
+      color: var(--bad);
+    }
+
+    .empty {
+      border: 1px dashed #c7d1c1;
+      border-radius: var(--radius);
+      background: #fff;
+      padding: 28px;
+      text-align: center;
+    }
+
+    .review-list {
+      display: grid;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .review-item {
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: #fff;
+      padding: 10px;
+    }
+
+    @media (max-width: 900px) {
+      .app {
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar {
+        position: static;
+        height: auto;
+        border-right: 0;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .main {
+        padding: 14px;
+      }
+
+      .topbar {
+        position: static;
+      }
+
+      .topbar-main,
+      .question-head {
+        flex-direction: column;
+      }
+
+      .question-index {
+        text-align: left;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand">
+        <h1>DeepSeek RD 选择题刷题</h1>
+        <span class="badge">单选 / 多选</span>
+      </div>
+
+      <section class="panel">
+        <div class="panel-title">本地记录</div>
+        <div class="stats">
+          <div class="stat"><strong id="statTotal">0</strong><span>累计作答</span></div>
+          <div class="stat"><strong id="statAccuracy">-</strong><span>累计正确率</span></div>
+          <div class="stat"><strong id="statWrong">0</strong><span>错题本</span></div>
+          <div class="stat"><strong id="statPracticed">0</strong><span>已刷题</span></div>
+          <div class="stat"><strong id="statBank">0</strong><span>题库总量</span></div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-title">刷题设置</div>
+        <div class="controls">
+          <select id="modeSelect" aria-label="刷题模式">
+            <option value="daily">今日 30 题</option>
+            <option value="random50">随机 50 题</option>
+            <option value="all">全量顺序</option>
+            <option value="unpracticed">只刷未刷题</option>
+            <option value="wrong">只刷错题</option>
+          </select>
+          <div class="control-row">
+            <select id="typeSelect" aria-label="题型">
+              <option value="all">全部题型</option>
+              <option value="single">只看单选</option>
+              <option value="multi">只看多选</option>
+            </select>
+            <button type="button" id="toggleAllCategories">反选考点</button>
+          </div>
+          <button type="button" class="primary" id="startBtn">开始本组</button>
+          <button type="button" class="danger" id="resetStatsBtn">清空本地记录</button>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-title">考点范围</div>
+        <div class="category-list" id="categoryList"></div>
+      </section>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div class="topbar-main">
+          <div>
+            <h2>日常刷题模式</h2>
+            <div class="muted">覆盖概率统计、机器学习、大模型、RAG、Agent、OS、网络、移动端性能与工程安全。</div>
+          </div>
+          <span class="badge" id="sessionBadge">未开始</span>
+        </div>
+        <div class="progress"><span id="progressBar"></span></div>
+      </header>
+
+      <section id="practiceArea"></section>
+    </main>
+  </div>
+
+  <script>
+    const STORAGE_KEY = "deepseek-choice-practice-v1";
+    const LETTERS = ["A", "B", "C", "D"];
+    const BANK = [
+      {id:1,t:"single",c:"概率统计与实验",q:"A/B 实验中随机分流最核心的目的是什么？",o:["让实验组用户更多","让实验组和对照组在统计意义上可比","让服务端缓存命中率更高","让样本量自动变大"],a:[1],e:"随机分流用于降低样本选择偏差，使实验组和对照组除实验变量外尽量一致。这样指标差异才更可能来自实验变量本身。"},
+      {id:2,t:"multi",c:"概率统计与实验",q:"下列哪些会让 A/B 实验结论不可靠？",o:["只统计成功完成流程的用户","实验期间修改指标口径","实验组和对照组互相污染","样本随机分配失效"],a:[0,1,2,3],e:"这些都会破坏对照条件或统计口径。A/B 实验要关注随机化、样本量、指标定义、曝光口径和实验污染。"},
+      {id:3,t:"single",c:"概率统计与实验",q:"P90 延迟表示什么？",o:["90% 样本的耗时不超过该值","平均耗时的 90%","只有 10 个样本时才可用","最慢 90% 样本的平均值"],a:[0],e:"P90 是分位数，能反映长尾体验。相比平均值，P90/P99 更容易暴露弱网、低端机、服务端排队等少数慢体验。"},
+      {id:4,t:"single",c:"概率统计与实验",q:"训练集和验证集发生用户泄漏，最可能导致什么？",o:["验证指标虚高","训练速度必然变慢","模型无法保存","线上接口无法请求"],a:[0],e:"泄漏会让验证集不再独立，模型可能记住用户或样本特征，导致离线指标过高但线上效果不佳。"},
+      {id:5,t:"multi",c:"概率统计与实验",q:"下列哪些属于常见统计基础概念？",o:["方差","标准差","置信区间","HTTP 状态码"],a:[0,1,2],e:"方差、标准差、置信区间都用于描述数据波动和估计可靠性。HTTP 状态码属于网络协议概念。"},
+      {id:6,t:"single",c:"概率统计与实验",q:"方差 Var(aX+b) 与 Var(X) 的关系是？",o:["aVar(X)+b","a^2Var(X)","Var(X)+b^2","Var(X)/a"],a:[1],e:"加常数不改变离散程度，乘 a 会让偏离均值的距离乘 a，平方后方差乘 a^2。"},
+      {id:7,t:"multi",c:"概率统计与实验",q:"线上指标分析中，为什么不能只看平均值？",o:["平均值容易被极端值影响","平均值不能反映长尾用户体验","分位数能辅助观察尾部延迟","平均值一定是错误指标"],a:[0,1,2],e:"平均值不是错误指标，但单独看平均值容易掩盖长尾。应结合 P50/P90/P99、分桶和样本量。"},
+      {id:8,t:"single",c:"概率统计与实验",q:"样本分配不随机最容易引入什么问题？",o:["样本偏差","TLS 失败","内存泄漏","线程死锁"],a:[0],e:"分配不随机会使实验组和对照组在用户属性、行为或时间上不可比，结论可能偏差。"},
+      {id:9,t:"multi",c:"概率统计与实验",q:"设计实验指标时应关注哪些点？",o:["指标定义稳定","分母口径清晰","只统计对自己有利的数据","实验前确定主要指标"],a:[0,1,3],e:"指标需要事前定义、口径稳定、分母明确。只挑有利数据会引入分析偏差。"},
+      {id:10,t:"single",c:"概率统计与实验",q:"标准差的单位与什么一致？",o:["原变量单位","原变量单位平方","无单位","样本数量单位"],a:[0],e:"标准差是方差开方，单位回到原变量单位，因此比方差更直观。"},
+      {id:11,t:"multi",c:"概率统计与实验",q:"下列哪些适合用于移动端性能指标分桶？",o:["设备档位","网络类型","App 版本","用户密码明文"],a:[0,1,2],e:"设备、网络、版本都是常见分桶维度。敏感明文不应采集，更不能作为诊断维度上传。"},
+      {id:12,t:"single",c:"概率统计与实验",q:"离线指标很好但线上效果差，最不应该立刻假设什么？",o:["可能有数据泄漏","可能训练/线上分布不一致","一定是用户不会用","可能指标口径不一致"],a:[2],e:"需要先检查数据、分布、埋点和实验口径，不能把问题直接归因给用户。"},
+
+      {id:13,t:"single",c:"机器学习基础",q:"使用带标签样本学习输入到输出映射，属于哪类学习？",o:["监督学习","无监督学习","强化学习","规则引擎"],a:[0],e:"监督学习依赖标签，典型任务包括分类、回归、排序等。"},
+      {id:14,t:"single",c:"机器学习基础",q:"过拟合的典型表现是？",o:["训练集好、测试集差","训练集差、测试集也差","无法读取文件","网络重试过多"],a:[0],e:"过拟合说明模型记住训练噪声而泛化差，可用正则化、早停、数据增强等缓解。"},
+      {id:15,t:"multi",c:"机器学习基础",q:"下列哪些有助于提升泛化能力？",o:["合理划分训练/验证/测试集","正则化或早停","增加高质量数据","只记忆训练样本"],a:[0,1,2],e:"泛化来自对未见样本的稳定表现。只记忆训练样本会降低泛化。"},
+      {id:16,t:"single",c:"机器学习基础",q:"分类任务中的交叉熵主要衡量什么？",o:["预测概率分布与真实标签的差异","磁盘空间大小","HTTP 缓存命中率","线程切换次数"],a:[0],e:"交叉熵常与 softmax 搭配，正确类概率越高 loss 越小。"},
+      {id:17,t:"multi",c:"机器学习基础",q:"分类模型常见指标包括哪些？",o:["Accuracy","Precision","Recall","F1-score"],a:[0,1,2,3],e:"类别不均衡时不能只看 Accuracy，应结合 Precision、Recall、F1、混淆矩阵等。"},
+      {id:18,t:"single",c:"机器学习基础",q:"欠拟合通常表示什么？",o:["模型能力不足或训练不充分，训练和测试都差","模型只在测试集好","模型一定太大","样本一定泄漏"],a:[0],e:"欠拟合常由特征不足、模型过弱、训练不够、正则过强等导致。"},
+      {id:19,t:"multi",c:"机器学习基础",q:"下列哪些属于常见正则化或防过拟合手段？",o:["L2 正则","dropout","early stopping","无限增大训练轮数"],a:[0,1,2],e:"正则化限制模型复杂度，早停防止继续记忆噪声。无限训练可能加重过拟合。"},
+      {id:20,t:"single",c:"机器学习基础",q:"文本 embedding 的主要用途是？",o:["将文本映射到向量空间以计算语义相似度","直接建立 TCP 连接","替代 App 生命周期","自动修复所有幻觉"],a:[0],e:"Embedding 常用于语义检索、相似问题匹配、聚类和 RAG 召回。"},
+      {id:21,t:"multi",c:"机器学习基础",q:"机器学习数据质量检查应关注哪些问题？",o:["标签噪声","样本重复","训练/线上分布差异","只看训练集准确率"],a:[0,1,2],e:"数据质量决定模型上限。只看训练集准确率无法证明线上可靠。"},
+      {id:22,t:"single",c:"机器学习基础",q:"Precision 更关注什么？",o:["预测为正的样本里有多少是真的正样本","真实正样本有多少被找回","总请求耗时","模型参数数量"],a:[0],e:"Precision 是查准率，Recall 是查全率。业务不同，两者权衡不同。"},
+      {id:23,t:"multi",c:"机器学习基础",q:"移动端 AI 功能中可能用到 ML 基础的场景包括哪些？",o:["意图识别","推荐排序","质量分类","证书链校验"],a:[0,1,2],e:"证书链校验是网络安全机制，不是机器学习任务。"},
+      {id:24,t:"single",c:"机器学习基础",q:"数据增强主要解决什么问题？",o:["增加样本多样性，提升模型鲁棒性","让 HTTP/2 不再丢包","让 UI 线程不阻塞","直接消除所有偏差"],a:[0],e:"数据增强可扩展训练分布，但不能替代严格的数据质量和评估。"},
+
+      {id:25,t:"single",c:"大模型基础",q:"自回归语言模型生成文本时通常如何工作？",o:["基于已有上下文逐 token 预测下一个 token","一次性无条件输出全部文本","只做字符串拼接","只查本地数据库"],a:[0],e:"自回归生成会把新 token 继续加入上下文，因此上下文长度和输出长度都影响延迟。"},
+      {id:26,t:"single",c:"大模型基础",q:"KV Cache 的主要作用是？",o:["缓存历史 token 的 Key/Value，减少重复计算","缓存 HTTP 图片","替代 tokenizer","保证内容一定正确"],a:[0],e:"KV Cache 降低增量解码成本，但会随上下文增长占用更多显存/内存。"},
+      {id:27,t:"multi",c:"大模型基础",q:"下列哪些会影响 LLM 推理延迟？",o:["上下文长度","输出 token 数","服务端排队","网络传输"],a:[0,1,2,3],e:"客户端感知延迟是端到端链路结果，包含模型计算、排队、网络和 UI 渲染。"},
+      {id:28,t:"single",c:"大模型基础",q:"temperature 调高通常会怎样？",o:["输出更随机、多样性更高","输出完全确定","上下文窗口消失","模型不再采样"],a:[0],e:"temperature 调整 token 分布平滑程度。越高越随机，越低越稳定。"},
+      {id:29,t:"multi",c:"大模型基础",q:"模型量化可能带来哪些影响？",o:["降低内存/显存占用","可能提升推理速度","可能损失精度","一定改变 tokenizer"],a:[0,1,2],e:"量化是数值表示压缩，不必然改变 tokenizer。"},
+      {id:30,t:"single",c:"大模型基础",q:"上下文窗口主要限制什么？",o:["一次请求可被模型利用的 token 数","App 可安装大小","TCP 连接数量","屏幕刷新率"],a:[0],e:"上下文窗口决定 prompt、历史消息、检索内容和工具结果能放入多少 token。"},
+      {id:31,t:"multi",c:"大模型基础",q:"流式输出对用户体验的价值包括哪些？",o:["降低首字可见延迟","让用户更早感知进展","便于支持停止生成","一定减少总 token 数"],a:[0,1,2],e:"流式输出不一定减少总 token，但能显著改善等待感和交互控制。"},
+      {id:32,t:"single",c:"大模型基础",q:"首 token 延迟主要描述什么？",o:["从请求发起到第一个生成片段可见的时间","完整回答总耗时","本地列表渲染总帧数","模型文件大小"],a:[0],e:"首 token 延迟是聊天产品非常关键的体验指标。"},
+      {id:33,t:"multi",c:"大模型基础",q:"大模型幻觉可能与哪些因素相关？",o:["缺少可靠上下文","检索内容错误","prompt 约束不足","答案一定来自真实数据库"],a:[0,1,2],e:"幻觉是模型生成不可靠内容的表现，RAG 和引用约束可降低但不能完全消除。"},
+      {id:34,t:"single",c:"大模型基础",q:"Tokenizer 的作用更接近什么？",o:["把文本切分/映射为模型使用的 token 序列","建立 TLS 握手","管理移动端线程池","统计崩溃率"],a:[0],e:"模型输入输出以 token 为单位，token 数影响成本、上下文和延迟。"},
+      {id:35,t:"multi",c:"大模型基础",q:"生产环境设置生成参数时要考虑哪些取舍？",o:["稳定性","多样性","安全性","可复现性"],a:[0,1,2,3],e:"不同场景对创造性、确定性和安全边界要求不同，应通过评测和灰度选择默认值。"},
+      {id:36,t:"single",c:"大模型基础",q:"长上下文对话成本上升的主要原因之一是？",o:["模型需要处理更多历史 token，KV Cache 也更大","HTTP 状态码变多","App 图标变大","DNS 一定失败"],a:[0],e:"长上下文增加 prefill 和缓存压力，也会影响服务端调度和延迟。"},
+
+      {id:37,t:"single",c:"Prompt 与安全",q:"Prompt Injection 的核心风险是？",o:["非可信输入试图改变模型/系统原本指令或诱导越权行为","用户输入字数太少","HTTP 缓存过期","屏幕亮度过高"],a:[0],e:"Prompt Injection 可来自用户、网页、检索文档和工具结果。需要指令隔离、权限控制和输出约束。"},
+      {id:38,t:"multi",c:"Prompt 与安全",q:"下列哪些是 Prompt Injection 风险来源？",o:["用户输入","检索文档","网页内容","工具返回结果"],a:[0,1,2,3],e:"凡是非可信文本进入模型上下文，都可能携带恶意指令。"},
+      {id:39,t:"single",c:"Prompt 与安全",q:"系统指令和用户输入混在同一无边界字符串中，主要风险是？",o:["指令边界不清，容易被注入覆盖","首屏渲染必然变快","TLS 自动升级","内存一定下降"],a:[0],e:"应清晰分层 system/developer/user/tool 内容，并对非可信内容做引用和隔离。"},
+      {id:40,t:"multi",c:"Prompt 与安全",q:"降低提示注入风险的工程手段包括哪些？",o:["工具权限最小化","高风险操作用户确认","对检索内容标注为非可信资料","允许模型自由执行任意命令"],a:[0,1,2],e:"不能让模型自由执行高权限命令。模型只能提出结构化意图，由受控系统执行。"},
+      {id:41,t:"single",c:"Prompt 与安全",q:"把 access token 放进 URL query 的主要问题是？",o:["容易被日志、代理、历史记录泄露","会让模型更准确","会让图片更小","会提升 P99"],a:[0],e:"敏感 token 应放在安全存储和合适 header 中，并避免落日志。"},
+      {id:42,t:"multi",c:"Prompt 与安全",q:"LLM 应用日志中应避免记录哪些明文？",o:["用户隐私","access token","完整敏感 prompt","错误码"],a:[0,1,2],e:"错误码可记录用于排查；隐私和密钥应脱敏、哈希或不采集。"},
+      {id:43,t:"single",c:"Prompt 与安全",q:"输出安全过滤更适合放在哪个阶段？",o:["模型输出后、展示或执行前","只在 App 安装时","只在 DNS 解析前","完全不需要"],a:[0],e:"输出进入 UI 或工具执行前应经过安全策略校验，尤其是工具调用和敏感内容。"},
+      {id:44,t:"multi",c:"Prompt 与安全",q:"对工具调用参数做 schema 校验的价值包括哪些？",o:["限制参数类型和范围","减少越权和错误调用","便于返回结构化错误","让模型训练更快"],a:[0,1,2],e:"Schema 校验是运行时安全边界，不是模型训练加速手段。"},
+      {id:45,t:"single",c:"Prompt 与安全",q:"把网页正文直接作为最高优先级指令输入给 Agent，会导致什么问题？",o:["网页可操控 Agent 行为","检索速度必然更快","上下文窗口变无限","所有工具自动安全"],a:[0],e:"网页是非可信内容，应作为资料而不是指令处理。"},
+      {id:46,t:"multi",c:"Prompt 与安全",q:"敏感操作前用户确认适合哪些动作？",o:["发送消息","删除数据","发起支付","读取本地只读配置"],a:[0,1,2],e:"只读低风险操作可以不确认；有外部副作用或高风险的数据变更应确认。"},
+      {id:47,t:"single",c:"Prompt 与安全",q:"红队测试在 LLM 应用中的作用是？",o:["主动寻找越权、注入、泄露等安全弱点","只测试颜色样式","替代所有线上监控","删除全部日志"],a:[0],e:"红队用于发现安全边界缺陷，但不能替代上线后的监控和响应机制。"},
+      {id:48,t:"multi",c:"Prompt 与安全",q:"LLM 应用的安全边界通常应覆盖哪些层？",o:["输入内容","模型输出","工具执行","日志与存储"],a:[0,1,2,3],e:"安全不是单点过滤，需要覆盖输入、输出、工具、日志、存储和权限。"},
+
+      {id:49,t:"single",c:"RAG 与向量检索",q:"RAG 的核心流程是？",o:["检索相关资料，再增强生成","只做图片压缩","只建立 TCP 连接","只执行正则匹配"],a:[0],e:"RAG 通过检索外部知识补充模型上下文，提升事实性和可追溯性。"},
+      {id:50,t:"multi",c:"RAG 与向量检索",q:"影响 RAG 效果的因素包括哪些？",o:["文档切分粒度","向量召回质量","rerank 策略","生成 prompt 约束"],a:[0,1,2,3],e:"RAG 是链路系统，任何环节差都会影响最终答案。"},
+      {id:51,t:"single",c:"RAG 与向量检索",q:"chunking 指什么？",o:["把长文档切成适合检索的小片段","把线程切到后台","删除全部上下文","压缩 TLS 证书"],a:[0],e:"Chunk 太大噪声多，太小丢上下文，常结合 overlap、标题和元数据。"},
+      {id:52,t:"multi",c:"RAG 与向量检索",q:"RAG 空召回时可采用哪些策略？",o:["提示用户知识库无相关内容","回退到通用回答但标明不基于资料","扩大检索或改写 query","伪造引用"],a:[0,1,2],e:"空召回不能伪造引用。应明确不确定性并可尝试 query rewrite 或降级。"},
+      {id:53,t:"single",c:"RAG 与向量检索",q:"向量召回 topK 过大可能带来什么问题？",o:["上下文噪声和 token 成本增加","一定提升准确率","DNS 失败","App 无法启动"],a:[0],e:"topK 过大可能引入无关内容，增加成本并干扰生成。"},
+      {id:54,t:"multi",c:"RAG 与向量检索",q:"混合检索通常可能结合哪些信号？",o:["关键词/BM25","向量相似度","元数据过滤","屏幕亮度"],a:[0,1,2],e:"混合检索结合精确关键词和语义相似度，常再加时间、权限等元数据过滤。"},
+      {id:55,t:"single",c:"RAG 与向量检索",q:"Rerank 的主要作用是？",o:["对召回候选重新排序，提升相关性","关闭模型采样","清空缓存","替代用户确认"],a:[0],e:"初召回追求覆盖，rerank 追求精排相关性，通常成本更高但可提升质量。"},
+      {id:56,t:"multi",c:"RAG 与向量检索",q:"RAG 引用展示的价值包括哪些？",o:["帮助用户核验证据","降低无根据回答风险","便于调试召回质量","保证答案永远正确"],a:[0,1,2],e:"引用能提升可追溯性，但不能保证答案永远正确。"},
+      {id:57,t:"single",c:"RAG 与向量检索",q:"向量检索中的 cosine similarity 衡量什么？",o:["向量方向相似度","TCP 拥塞窗口","磁盘剩余空间","线程优先级"],a:[0],e:"Cosine similarity 常用于 embedding 相似度，尤其在向量归一化后很常见。"},
+      {id:58,t:"multi",c:"RAG 与向量检索",q:"构建知识库索引时应关注哪些问题？",o:["文档权限","版本更新时间","去重和失效","把所有用户隐私无差别写入"],a:[0,1,2],e:"知识库要有权限、更新和删除机制，不能无差别收集敏感隐私。"},
+      {id:59,t:"single",c:"RAG 与向量检索",q:"Query rewrite 在 RAG 中常用于什么？",o:["把用户问题改写成更利于检索的查询","替代模型输出","关闭安全策略","减少设备电量"],a:[0],e:"改写可补充同义词、消歧或拆分问题，但要避免改变用户原意。"},
+      {id:60,t:"multi",c:"RAG 与向量检索",q:"RAG 评估可关注哪些指标？",o:["检索 recall","答案相关性","faithfulness/忠实度","首 token 和总延迟"],a:[0,1,2,3],e:"RAG 同时要评估质量和体验成本，包括检索、生成、延迟和安全。"},
+
+      {id:61,t:"single",c:"Agent 工程",q:"Agent tool calling 的最小闭环通常包括什么？",o:["模型选择工具、系统执行工具、模型观察结果继续推理","只显示静态文案","只训练分类器","只清理本地缓存"],a:[0],e:"Agent 通过 action/observation 迭代完成任务，工程上要受控执行。"},
+      {id:62,t:"multi",c:"Agent 工程",q:"工具定义通常应包含哪些内容？",o:["工具名称","参数 schema","返回格式","权限/风险等级"],a:[0,1,2,3],e:"结构化工具定义便于模型选择，也便于系统校验、审计和权限控制。"},
+      {id:63,t:"single",c:"Agent 工程",q:"ReAct 模式强调什么？",o:["推理、行动、观察的循环","只输出最终答案","只做一次数据库查询","禁用所有工具"],a:[0],e:"ReAct 适合需要多步查询、工具调用和观察反馈的任务。"},
+      {id:64,t:"multi",c:"Agent 工程",q:"Agent 防止无限循环可采用哪些策略？",o:["最大步数","最大耗时/成本","重复工具调用检测","允许无上限自动重试"],a:[0,1,2],e:"Agent 必须有预算和停止条件，不能无上限调用。"},
+      {id:65,t:"single",c:"Agent 工程",q:"Tool dispatcher 不应做什么？",o:["直接相信模型输出并执行任意工具","校验工具 allowlist","校验参数 schema","捕获工具异常"],a:[0],e:"Dispatcher 是安全边界，必须校验模型的结构化调用。"},
+      {id:66,t:"multi",c:"Agent 工程",q:"Agent 观测日志应包含哪些信息？",o:["traceId","每步工具名和耗时","错误码和降级原因","用户密码明文"],a:[0,1,2],e:"日志要支持排查，但敏感信息必须脱敏或不采集。"},
+      {id:67,t:"single",c:"Agent 工程",q:"高风险工具调用前为什么要用户确认？",o:["因为模型可能误判意图或被注入诱导","为了让页面更慢","因为所有工具都读不到参数","为了关闭日志"],a:[0],e:"发送、删除、支付等有外部副作用的操作需要明确用户确认。"},
+      {id:68,t:"multi",c:"Agent 工程",q:"Agent 记忆设计需要考虑哪些点？",o:["短期会话状态","长期偏好更新","过期和删除机制","错误记忆污染"],a:[0,1,2,3],e:"记忆会影响后续行为，必须可控、可删除、可评估。"},
+      {id:69,t:"single",c:"Agent 工程",q:"Planning 类 Agent 最常见的工程风险之一是？",o:["计划过长或不可执行，导致成本和延迟失控","HTTP 证书自动更新","图片无法解码","方差公式错误"],a:[0],e:"多步规划要有预算、阶段性检查、失败回退和用户澄清。"},
+      {id:70,t:"multi",c:"Agent 工程",q:"移动端接入 Agent 时要额外关注哪些体验问题？",o:["长任务进度反馈","取消和恢复","弱网超时","后台切换状态"],a:[0,1,2,3],e:"Agent 任务可能多步且耗时，移动端必须处理生命周期和弱网。"},
+      {id:71,t:"single",c:"Agent 工程",q:"Observation 在工具调用链路中指什么？",o:["工具执行后的结构化结果或错误","用户屏幕亮度","模型参数大小","DNS 响应包"],a:[0],e:"模型根据 observation 决定下一步，因此返回结构要稳定、简洁、可解析。"},
+      {id:72,t:"multi",c:"Agent 工程",q:"Agent 失败降级策略包括哪些？",o:["请求用户补充信息","返回部分结果","切换到普通问答","继续无限循环"],a:[0,1,2],e:"降级应让用户可理解、可继续，不应无限循环。"},
+
+      {id:73,t:"single",c:"OS/并发/计组",q:"CPU cache 主要利用什么特性？",o:["时间局部性和空间局部性","HTTP 无状态","证书链","UI 文案"],a:[0],e:"局部性让近期或相邻数据更可能再次访问，影响数组、链表和数据布局性能。"},
+      {id:74,t:"multi",c:"OS/并发/计组",q:"死锁必要条件包括哪些？",o:["互斥","持有并等待","不可抢占","循环等待"],a:[0,1,2,3],e:"死锁需要互斥、持有并等待、不可抢占、循环等待四个条件同时成立。打破任一条件都能预防死锁，例如统一加锁顺序、使用 tryLock/超时释放、避免持锁执行阻塞 IO。移动端里主线程等待后台锁、队列互等也会表现为卡死或 ANR。"},
+      {id:75,t:"single",c:"OS/并发/计组",q:"线程上下文切换通常比进程切换轻，主要因为？",o:["同进程线程共享地址空间","线程没有栈","线程不会调度","线程无法访问堆"],a:[0],e:"线程仍有栈、寄存器和调度状态，但共享进程资源降低部分切换成本。"},
+      {id:76,t:"multi",c:"OS/并发/计组",q:"并发程序常见问题包括哪些？",o:["数据竞争","死锁","可见性问题","原子性问题"],a:[0,1,2,3],e:"并发问题既有正确性风险，也可能造成卡顿、ANR 和状态错乱。"},
+      {id:77,t:"single",c:"OS/并发/计组",q:"虚拟内存不能保证什么？",o:["所有内存访问都不会缺页","进程地址空间隔离","按需分页","地址抽象"],a:[0],e:"缺页会触发 page fault，严重时影响性能或导致内存压力。"},
+      {id:78,t:"multi",c:"OS/并发/计组",q:"线程间共享变量没有同步可能导致哪些问题？",o:["数据竞争","内存可见性问题","乱序可见","HTTP 状态码变少"],a:[0,1,2],e:"需要锁、原子变量、串行队列或不可变数据等手段保证并发安全。"},
+      {id:79,t:"single",c:"OS/并发/计组",q:"移动端主线程执行 CPU 密集任务最直接后果是？",o:["卡顿或 ANR","TLS 更安全","DNS 更快","模型更准"],a:[0],e:"主线程阻塞会影响输入、布局、绘制和动画调度。"},
+      {id:80,t:"multi",c:"OS/并发/计组",q:"定位卡顿时常看哪些信号？",o:["主线程耗时","掉帧率","锁等待","图片解码耗时"],a:[0,1,2,3],e:"卡顿通常由多因素叠加，需要结合 trace、帧率和任务耗时。"},
+      {id:81,t:"single",c:"OS/并发/计组",q:"LRU Cache 通常用什么结构实现 O(1) get/put？",o:["哈希表 + 双向链表","单个数组排序","递归栈","TCP 窗口"],a:[0],e:"LRU 的关键是既能 O(1) 找到 key，又能 O(1) 更新访问顺序。哈希表负责 key 到链表节点的定位，双向链表维护最近使用到最久未使用的顺序，访问或更新时移到头部，容量满时淘汰尾部。移动端图片、配置和会话缓存常用这个思想。"},
+      {id:82,t:"multi",c:"OS/并发/计组",q:"本地缓存设计应考虑哪些点？",o:["容量限制","过期策略","并发访问安全","永不清理"],a:[0,1,2],e:"缓存必须有容量和失效策略，否则会带来内存/磁盘问题。"},
+      {id:83,t:"single",c:"OS/并发/计组",q:"文件描述符泄漏可能导致什么？",o:["新文件或 socket 打开失败","模型上下文变大","图片自动压缩","P50 一定降低"],a:[0],e:"fd 是系统资源，泄漏会造成稳定性问题。"},
+      {id:84,t:"multi",c:"OS/并发/计组",q:"内存问题排查常用哪些手段？",o:["heap dump","对象引用链","Android Profiler/Instruments","只看 HTTP 200"],a:[0,1,2],e:"接口成功不代表没有泄漏。需要看对象、缓存、图片和生命周期。"},
+
+      {id:85,t:"single",c:"网络/缓存/安全",q:"HTTP ETag 的主要作用是？",o:["校验资源版本是否变化","建立 TCP 连接","压缩请求体","替代 TLS"],a:[0],e:"ETag 配合 If-None-Match 实现协商缓存，未变化可返回 304。"},
+      {id:86,t:"multi",c:"网络/缓存/安全",q:"HTTP 缓存相关机制包括哪些？",o:["Cache-Control","ETag","Last-Modified","SYN"],a:[0,1,2],e:"SYN 属于 TCP 建连，不是 HTTP 缓存。"},
+      {id:87,t:"single",c:"网络/缓存/安全",q:"HTTP/2 多路复用主要解决什么？",o:["单连接上多个请求响应可并发交错传输","完全消除 TCP 丢包影响","不再需要证书","让 JSON 自动变小"],a:[0],e:"HTTP/2 减少应用层队头阻塞，但 TCP 层丢包仍可能影响连接。"},
+      {id:88,t:"multi",c:"网络/缓存/安全",q:"弱网重试设计需要哪些要素？",o:["幂等性","退避策略","最大重试次数","无限快速重试"],a:[0,1,2],e:"弱网重试必须先确认请求是否幂等，避免重复提交；退避策略通常用指数退避加随机抖动，避免请求风暴；最大重试次数用于控制成本和用户等待。无限快速重试会放大服务端压力，并让移动端耗电、耗流量和体验都变差。"},
+      {id:89,t:"single",c:"网络/缓存/安全",q:"HTTP 429 通常表示什么？",o:["请求被限流","证书过期","资源未修改","请求成功"],a:[0],e:"429 应结合 Retry-After 或退避策略处理。"},
+      {id:90,t:"multi",c:"网络/缓存/安全",q:"HTTPS 证书校验主要涉及哪些内容？",o:["证书链","域名匹配","有效期","用户密码明文"],a:[0,1,2],e:"证书校验用于确认服务端身份，不能记录用户密码明文。"},
+      {id:91,t:"single",c:"网络/缓存/安全",q:"SSE 常见 Content-Type 是？",o:["text/event-stream","application/zip","image/png","text/cache-control"],a:[0],e:"SSE 适合服务端向客户端单向推送文本事件，常用于 LLM 流式输出。"},
+      {id:92,t:"multi",c:"网络/缓存/安全",q:"流式响应客户端需要处理哪些状态？",o:["正常增量片段","用户取消","网络中断","业务错误或限流"],a:[0,1,2,3],e:"流式链路必须有完整状态机，否则容易卡住或重复展示。"},
+      {id:93,t:"single",c:"网络/缓存/安全",q:"TCP 拥塞窗口控制什么？",o:["未确认数据量，避免过度注入网络","HTTP 文案大小","图片解码线程","App 图标大小"],a:[0],e:"拥塞窗口和接收窗口共同影响发送节奏、吞吐和延迟。"},
+      {id:94,t:"multi",c:"网络/缓存/安全",q:"安全通信基本要求包括哪些？",o:["HTTPS 证书校验","token 不明文落盘","敏感日志脱敏","token 放 URL query 便于排查"],a:[0,1,2],e:"token 放 URL query 容易被日志和代理记录，应避免。"},
+      {id:95,t:"single",c:"网络/缓存/安全",q:"DNS 解析耗时异常会影响哪个指标？",o:["请求链路首段延迟","GPU 显存","ARC 引用计数","模型参数量"],a:[0],e:"端到端网络耗时可拆 DNS、TCP、TLS、TTFB、下载等阶段。"},
+      {id:96,t:"multi",c:"网络/缓存/安全",q:"移动端网络诊断常记录哪些非敏感维度？",o:["网络类型","错误码","请求阶段耗时","access token 明文"],a:[0,1,2],e:"网络类型、错误码、阶段耗时有助定位；token 明文不能记录。"},
+
+      {id:97,t:"single",c:"移动端工程",q:"Android Looper 的核心职责是？",o:["从消息队列取消息并分发处理","执行 TLS 握手","训练模型","压缩图片"],a:[0],e:"Looper、MessageQueue、Handler 构成 Android 线程消息循环基础。"},
+      {id:98,t:"multi",c:"移动端工程",q:"前后台切换时聊天产品要处理哪些问题？",o:["未完成请求取消或恢复","流状态保存","UI 状态恢复","忽略生命周期"],a:[0,1,2],e:"生命周期处理不好会导致状态错乱、泄漏或重复请求。"},
+      {id:99,t:"single",c:"移动端工程",q:"iOS ARC 主要负责什么？",o:["自动引用计数内存管理","TCP 拥塞控制","DNS 缓存","GPU 调度"],a:[0],e:"ARC 通过引用计数管理对象生命周期，但循环引用仍需 weak/unowned 等处理。"},
+      {id:100,t:"multi",c:"移动端工程",q:"定位 Android/iOS 内存问题适合用哪些工具或方法？",o:["Android Profiler","Xcode Instruments","对象引用链分析","只看接口状态码"],a:[0,1,2],e:"内存问题要看分配、引用链、缓存和生命周期，不是网络状态码能解释的。"},
+      {id:101,t:"single",c:"移动端工程",q:"后台线程直接更新 Android View 的风险是？",o:["违反 UI 线程模型，可能崩溃或行为异常","一定提升帧率","自动修复 GC","自动合并请求"],a:[0],e:"UI 更新应切回主线程，且要绑定生命周期。"},
+      {id:102,t:"multi",c:"移动端工程",q:"流式文本不断追加导致滚动卡顿，可优化哪些方向？",o:["批量刷新","文本分段/异步排版","列表复用","逐字符同步刷新"],a:[0,1,2],e:"逐字符同步刷新会加重主线程压力，应节流和批处理。"},
+      {id:103,t:"single",c:"移动端工程",q:"60 FPS 下单帧预算约是多少？",o:["16.67ms","1s","100ms","60ms"],a:[0],e:"超过帧预算容易造成掉帧，实际还要考虑输入、布局、绘制和系统开销。"},
+      {id:104,t:"multi",c:"移动端工程",q:"移动端工程质量指标包括哪些？",o:["崩溃率","ANR/卡死率","冷启动耗时","代码注释越多越好"],a:[0,1,2],e:"注释有价值但不是越多越好，质量指标应能反映稳定性和体验。"},
+      {id:105,t:"single",c:"移动端工程",q:"用户点击停止生成时，客户端最不应该做什么？",o:["只改按钮文案但不取消请求或忽略后续片段","更新 UI 状态","取消网络流","处理服务端后续片段"],a:[0],e:"停止生成是完整链路，需要 UI、网络、服务端和本地状态一致。"},
+      {id:106,t:"multi",c:"移动端工程",q:"聊天页面长时间使用后越来越卡，可能原因包括哪些？",o:["文本布局缓存无限增长","列表复用不当","图片/附件内存峰值","首 token 太快"],a:[0,1,2],e:"首 token 太快不是卡顿原因。长会话要重点看 UI、内存和缓存。"},
+      {id:107,t:"single",c:"移动端工程",q:"本地持久化适合处理什么？",o:["离线可用或跨启动保存的数据","每帧临时绘制状态","所有 access token 明文","无限增长日志"],a:[0],e:"持久化要考虑加密、容量、迁移和失效策略。"},
+      {id:108,t:"multi",c:"移动端工程",q:"移动端接入大模型能力时，RD 需要理解哪些系统问题？",o:["网络弱网和取消","UI 增量渲染","模型基础延迟来源","隐私和日志边界"],a:[0,1,2,3],e:"移动端 AI 体验是端到端系统问题，不只是调用一个接口。"}
+    ];
+
+    const CATEGORY_KNOWLEDGE = {
+      "概率统计与实验": "相关知识：概率统计用于判断指标是否可信，A/B 实验用于验证产品或模型改动是否真实有效。重点掌握随机分流、样本偏差、训练/验证/测试隔离、均值/方差/标准差、分位数、置信区间、指标口径和长尾分析。移动端 AI 产品常用这些知识分析首 token 延迟、失败率、留存、满意度和不同设备/网络分桶下的体验差异。",
+      "机器学习基础": "相关知识：机器学习基础关注模型如何从数据中学习并泛化到未见样本。重点掌握监督学习、无监督学习、训练/验证/测试集、过拟合、欠拟合、正则化、交叉熵、Precision/Recall/F1、数据质量和分布漂移。移动端 RD 不一定训练大模型，但需要理解意图识别、排序、推荐、质量分类和端侧模型效果评估。",
+      "大模型基础": "相关知识：大模型应用工程需要理解 token、tokenizer、自回归生成、上下文窗口、KV Cache、采样参数、量化、流式输出、首 token 延迟和幻觉。移动端侧重点不是推导模型结构，而是能拆解端到端延迟、理解长上下文成本、设计停止生成和增量渲染，并能和服务端一起定位质量与性能问题。",
+      "Prompt 与安全": "相关知识：Prompt 和安全设计的核心是指令边界、非可信内容隔离和高风险动作控制。重点掌握 system/user/tool 内容分层、Prompt Injection、工具权限、schema 校验、输出过滤、敏感信息脱敏、用户确认、审计日志和红队测试。Agent 或 RAG 会把网页、文档和工具结果放进上下文，更要防止资料变成指令。",
+      "RAG 与向量检索": "相关知识：RAG 通过检索外部知识增强生成，关键链路包括文档清洗、chunking、embedding、向量/关键词/混合检索、topK、rerank、prompt 组装、引用展示和空召回处理。评估时既要看召回和答案相关性，也要看 faithfulness、延迟、成本、权限过滤和知识更新。RAG 质量差通常不是单个模型参数能解决的。",
+      "Agent 工程": "相关知识：Agent 工程关注模型如何规划、调用工具、观察结果并继续完成任务。重点掌握 tool calling、allowlist、参数 schema、observation、ReAct、最大步数/成本、循环检测、失败降级、记忆管理、权限分级和审计日志。移动端接入 Agent 时还要处理弱网、取消、前后台切换、进度反馈和用户确认。",
+      "OS/并发/计组": "相关知识：系统基础直接影响移动端稳定性和性能。重点掌握进程/线程、上下文切换、虚拟内存、page fault、CPU cache、死锁条件、数据竞争、内存可见性、锁、原子操作、LRU、文件描述符和内存泄漏。很多卡顿、ANR、OOM、长尾延迟问题本质上都是系统资源和并发调度问题。",
+      "网络/缓存/安全": "相关知识：网络链路决定 AI 应用的可用性和弱网体验。重点掌握 DNS、TCP、TLS、HTTP/2、HTTP 缓存、ETag、SSE、429 限流、超时、重试、幂等、退避、证书校验、token 安全和日志脱敏。大模型流式输出要特别关注首 token、分片间隔、取消、断线恢复和服务端错误终态。",
+      "移动端工程": "相关知识：移动端工程把模型能力变成可用产品体验。重点掌握 Android Looper/Handler、iOS RunLoop/ARC、生命周期、主线程帧预算、列表复用、文本排版、图片解码、内存分析、崩溃率、ANR、冷启动、弱网状态机、缓存和本地持久化。移动端 AI 场景还要处理流式增量渲染、停止生成、长会话性能和隐私边界。"
+    };
+
+    const TOPIC_KNOWLEDGE = [
+      {re:/A\/B|随机|实验|样本|指标|方差|标准差|置信|P90|P99|分位|分桶|泄漏|验证集|线上效果/,text:"题目级知识：实验和统计题要先确认样本是否随机、指标口径是否稳定、分组是否可比。均值描述整体，分位数描述长尾；训练/验证泄漏会让离线指标虚高，线上 A/B 和分桶分析才能暴露真实体验。"},
+      {re:/监督学习|过拟合|欠拟合|正则|交叉熵|Precision|Recall|F1|embedding|标签|数据增强|泛化|分布/,text:"题目级知识：机器学习题要区分任务类型、损失函数、评估指标和泛化能力。过拟合是训练好测试差，欠拟合是训练和测试都差；Precision 偏查准，Recall 偏查全，F1 是二者的调和平均。"},
+      {re:/自回归|LLM|token|Tokenizer|KV Cache|上下文|temperature|量化|幻觉|首 token|流式|长上下文/,text:"题目级知识：大模型推理通常分 prefill 和 decode，token 数会影响上下文成本、首 token 延迟和总耗时。KV Cache 复用历史 Key/Value，采样参数影响稳定性与多样性，量化降低资源占用但可能带来精度损失。"},
+      {re:/Prompt|Injection|指令|非可信|安全|token|敏感|日志|schema|确认|红队|工具权限/,text:"题目级知识：Prompt 与安全题要抓住指令边界、非可信内容隔离和权限最小化。用户输入、网页、检索文档和工具结果都可能注入恶意指令；敏感日志要脱敏，高风险动作要用户确认。"},
+      {re:/RAG|检索|chunk|embedding|向量|topK|混合检索|Rerank|引用|Query rewrite|召回|faithfulness/,text:"题目级知识：RAG 题要按链路拆解：文档切分、embedding、召回、rerank、prompt 组装、引用展示和空召回处理。topK 过大可能引入噪声，引用能提升可追溯性但不能保证答案永远正确。"},
+      {re:/Agent|tool|工具|ReAct|dispatcher|observation|循环|记忆|规划|降级|权限|进度/,text:"题目级知识：Agent 题重点看工具调用闭环和安全边界。模型提出 action，系统校验并执行工具，再把 observation 返回模型；工程上必须设置 allowlist、schema、最大步数、成本预算、循环检测和失败降级。"},
+      {re:/CPU cache|死锁|线程|进程|虚拟内存|数据竞争|可见性|主线程|LRU|文件描述符|heap|内存|锁|ANR/,text:"题目级知识：系统题要理解资源和并发。死锁四条件是互斥、持有并等待、不可抢占、循环等待；LRU 常用哈希表加双向链表；主线程 CPU 密集任务、锁等待和内存泄漏都会造成移动端卡顿或稳定性问题。"},
+      {re:/HTTP|ETag|Cache-Control|HTTP\/2|重试|弱网|429|证书|SSE|流式响应|TCP|DNS|token|网络诊断/,text:"题目级知识：网络题要按端到端链路拆 DNS、TCP、TLS、TTFB、下载和业务状态。缓存看 Cache-Control/ETag/Last-Modified；弱网重试要考虑幂等、退避、最大次数；SSE 常用于 LLM 文本流式输出。"},
+      {re:/Android|Looper|Handler|iOS|ARC|View|60 FPS|滚动|文本|生命周期|停止生成|持久化|冷启动|列表/,text:"题目级知识：移动端工程题要把主线程模型、生命周期、弱网状态机和 UI 渲染成本连起来。60 FPS 单帧预算约 16.67ms，流式文本追加要节流、批量刷新和异步排版，停止生成要同时处理 UI、网络和服务端状态。"}
+    ];
+
+    const categories = Array.from(new Set(BANK.map((q) => q.c)));
+    let selectedCategories = new Set(categories);
+    let session = [];
+    let index = 0;
+    let checked = false;
+    let selected = new Set();
+    let state = loadState();
+
+    const $ = (selector, root = document) => root.querySelector(selector);
+    const $$ = (selector, root = document) => Array.from(root.querySelectorAll(selector));
+
+    function cleanIdList(value) {
+      return Array.from(new Set((Array.isArray(value) ? value : [])
+        .map((item) => Number(item))
+        .filter((item) => Number.isInteger(item) && item > 0)))
+        .sort((a, b) => a - b);
+    }
+
+    function defaultState() {
+      return { total: 0, correct: 0, wrongIds: [], practicedIds: [], answers: {} };
+    }
+
+    function normalizeState(value) {
+      return {
+        total: Number.isInteger(value?.total) && value.total > 0 ? value.total : 0,
+        correct: Number.isInteger(value?.correct) && value.correct > 0 ? value.correct : 0,
+        wrongIds: cleanIdList(value?.wrongIds),
+        practicedIds: cleanIdList(value?.practicedIds),
+        answers: value?.answers && typeof value.answers === "object" && !Array.isArray(value.answers)
+          ? value.answers
+          : {}
+      };
+    }
+
+    function loadState() {
+      try {
+        return normalizeState(JSON.parse(localStorage.getItem(STORAGE_KEY)));
+      } catch {
+        return defaultState();
+      }
+    }
+
+    function saveState() {
+      state = normalizeState(state);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      renderStats();
+    }
+
+    async function fetchServerProgress() {
+      try {
+        const response = await fetch("/api/progress", { cache: "no-store" });
+        if (!response.ok) return;
+        state = normalizeState(await response.json());
+        saveState();
+        render();
+      } catch {
+        // Local state remains usable when the server-side store is unavailable.
+      }
+    }
+
+    async function postServerAnswer(q, correct) {
+      try {
+        const response = await fetch("/api/progress/answer", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({
+            questionId: q.id,
+            correct,
+            selected: Array.from(selected).sort((a, b) => a - b)
+          })
+        });
+        if (!response.ok) return;
+        state = normalizeState(await response.json());
+        saveState();
+        render();
+      } catch {
+        // Browser-local progress already captured the answer.
+      }
+    }
+
+    async function resetServerProgress() {
+      try {
+        const response = await fetch("/api/progress/reset", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: "{}"
+        });
+        if (!response.ok) return;
+        state = normalizeState(await response.json());
+        saveState();
+        render();
+      } catch {
+        // Local reset still applies if the server call fails.
+      }
+    }
+
+    function addUniqueId(ids, id) {
+      return cleanIdList([...ids, id]);
+    }
+
+    function shuffle(items) {
+      const copy = items.slice();
+      for (let i = copy.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [copy[i], copy[j]] = [copy[j], copy[i]];
+      }
+      return copy;
+    }
+
+    function dailyShuffle(items) {
+      const today = new Date().toISOString().slice(0, 10);
+      let seed = 0;
+      for (const ch of today) seed = (seed * 31 + ch.charCodeAt(0)) >>> 0;
+      const copy = items.slice();
+      for (let i = copy.length - 1; i > 0; i--) {
+        seed = (seed * 1664525 + 1013904223) >>> 0;
+        const j = seed % (i + 1);
+        [copy[i], copy[j]] = [copy[j], copy[i]];
+      }
+      return copy;
+    }
+
+    function questionPool() {
+      const type = $("#typeSelect").value;
+      const wrongIds = new Set(state.wrongIds);
+      const practicedIds = new Set(state.practicedIds);
+      return BANK.filter((q) => {
+        if (!selectedCategories.has(q.c)) return false;
+        if (type !== "all" && q.t !== type) return false;
+        if ($("#modeSelect").value === "unpracticed" && practicedIds.has(q.id)) return false;
+        if ($("#modeSelect").value === "wrong" && !wrongIds.has(q.id)) return false;
+        return true;
+      });
+    }
+
+    function startSession() {
+      let pool = questionPool();
+      const mode = $("#modeSelect").value;
+      if (mode === "daily") pool = dailyShuffle(pool).slice(0, 30);
+      if (mode === "random50") pool = shuffle(pool).slice(0, 50);
+      if (mode === "all") pool = pool.slice().sort((a, b) => a.id - b.id);
+      if (mode === "unpracticed") pool = shuffle(pool);
+      if (mode === "wrong") pool = shuffle(pool);
+      session = pool;
+      index = 0;
+      checked = false;
+      selected = new Set();
+      render();
+    }
+
+    function renderCategories() {
+      $("#categoryList").innerHTML = categories.map((category) => {
+        const count = BANK.filter((q) => q.c === category).length;
+        const active = selectedCategories.has(category);
+        return `<button type="button" class="category-chip ${active ? "active" : ""}" data-category="${category}">
+          <span>${category}</span><span class="muted">${count}</span>
+        </button>`;
+      }).join("");
+    }
+
+    function renderStats() {
+      $("#statTotal").textContent = String(state.total);
+      $("#statAccuracy").textContent = state.total ? `${Math.round((state.correct / state.total) * 100)}%` : "-";
+      $("#statWrong").textContent = String(state.wrongIds.length);
+      $("#statPracticed").textContent = String(state.practicedIds.length);
+      $("#statBank").textContent = String(BANK.length);
+    }
+
+    function render() {
+      renderStats();
+      renderCategories();
+      const area = $("#practiceArea");
+      const current = session[index];
+      $("#sessionBadge").textContent = session.length ? `${index + 1}/${session.length}` : "未开始";
+      $("#progressBar").style.width = session.length ? `${Math.round((index / session.length) * 100)}%` : "0%";
+      if (!session.length) {
+        area.innerHTML = `<div class="empty">
+          <h3>选择考点和模式后开始刷题</h3>
+          <p class="muted">当前题库 ${BANK.length} 题，全部为单选或多选。服务端可用时会记录已刷题，浏览器本地记录作为兜底。</p>
+        </div>`;
+        return;
+      }
+      area.innerHTML = renderQuestion(current);
+    }
+
+    function renderQuestion(q) {
+      const result = checked ? isCorrect(q) : null;
+      const answerLetters = q.a.map((i) => LETTERS[i]).join("");
+      return `<article class="question-card">
+        <div class="question-head">
+          <div>
+            <div class="question-meta">
+              <span class="pill">${q.c}</span>
+              <span class="pill">${q.t === "single" ? "单选" : "多选"}</span>
+              <span class="pill">#${q.id}</span>
+              ${state.practicedIds.includes(q.id) ? `<span class="pill done">已刷过</span>` : ""}
+            </div>
+            <h3>${escapeHtml(q.q)}</h3>
+          </div>
+          <div class="question-index">${index + 1} / ${session.length}</div>
+        </div>
+        <div class="question-body">
+          <div class="options">
+            ${q.o.map((option, optionIndex) => renderOption(q, option, optionIndex)).join("")}
+          </div>
+          <div class="actions">
+            <button type="button" class="primary" id="checkBtn" ${checked ? "disabled" : ""}>提交本题</button>
+            <button type="button" id="nextBtn">${index === session.length - 1 ? "结束本组" : "下一题"}</button>
+            <button type="button" id="restartBtn">重开本组</button>
+          </div>
+          <div class="explanation ${checked ? "show" : ""}">
+            <div class="answer-line ${result ? "good" : "bad"}">${checked ? (result ? "回答正确" : "需要复盘") : ""}，参考答案：${answerLetters}</div>
+            <span class="knowledge-title">答案解析</span>
+            ${renderParagraphs(q.e)}
+            <span class="knowledge-title">相关知识介绍</span>
+            ${renderParagraphs(relatedKnowledge(q))}
+          </div>
+        </div>
+      </article>`;
+    }
+
+    function relatedKnowledge(q) {
+      const answerText = q.a.map((optionIndex) => `${LETTERS[optionIndex]}.${q.o[optionIndex]}`).join("；");
+      const questionTopic = q.q.replace(/[?？]\s*$/, "");
+      const corpus = `${q.q}\n${q.o.join("\n")}\n${q.e}`;
+      const topicKnowledge = TOPIC_KNOWLEDGE
+        .filter((item) => item.re.test(corpus))
+        .map((item) => item.text);
+      const typeNote = q.t === "single"
+        ? "单选题复盘时重点确认唯一决定性条件：为什么正确选项覆盖题干核心，为什么其余选项偷换了概念、场景或因果。"
+        : "多选题复盘时重点确认必要条件集合：既要找全正确项，也要排除看似相关但会破坏边界、权限、性能或安全约束的选项。";
+      return [
+        `本题考点：${questionTopic}。正确选项是 ${answerText}。`,
+        `做题抓手：${q.e}`,
+        ...[...new Set(topicKnowledge)].slice(0, 3),
+        typeNote,
+        CATEGORY_KNOWLEDGE[q.c] || "相关知识：围绕题干中的概念、工程边界和常见误区做复盘，确保能解释正确项和错误项的差异。"
+      ].join("\n\n");
+    }
+
+    function renderOption(q, option, optionIndex) {
+      const inputType = q.t === "single" ? "radio" : "checkbox";
+      const isSelected = selected.has(optionIndex);
+      const isAnswer = q.a.includes(optionIndex);
+      let cls = "option";
+      if (checked && isAnswer) cls += " correct";
+      if (checked && isSelected && !isAnswer) cls += " wrong";
+      return `<label class="${cls}">
+        <input type="${inputType}" name="answer" value="${optionIndex}" ${isSelected ? "checked" : ""} ${checked ? "disabled" : ""}>
+        <span><strong>${LETTERS[optionIndex]}.</strong> ${escapeHtml(option)}</span>
+      </label>`;
+    }
+
+    function isCorrect(q) {
+      const expected = q.a.slice().sort().join(",");
+      const actual = Array.from(selected).sort((a, b) => a - b).join(",");
+      return expected === actual;
+    }
+
+    function checkCurrent() {
+      const q = session[index];
+      if (!q || checked || !selected.size) return;
+      checked = true;
+      const correct = isCorrect(q);
+      state.total += 1;
+      state.practicedIds = addUniqueId(state.practicedIds, q.id);
+      state.answers = {
+        ...state.answers,
+        [String(q.id)]: {
+          selected: Array.from(selected).sort((a, b) => a - b),
+          correct,
+          attempts: Number.isInteger(state.answers[String(q.id)]?.attempts)
+            ? state.answers[String(q.id)].attempts + 1
+            : 1,
+          lastAnsweredAt: new Date().toISOString()
+        }
+      };
+      if (correct) {
+        state.correct += 1;
+        state.wrongIds = state.wrongIds.filter((id) => id !== q.id);
+      } else if (!state.wrongIds.includes(q.id)) {
+        state.wrongIds.push(q.id);
+      }
+      saveState();
+      render();
+      postServerAnswer(q, correct);
+    }
+
+    function nextQuestion() {
+      if (!session.length) return;
+      if (index >= session.length - 1) {
+        $("#progressBar").style.width = "100%";
+        $("#practiceArea").innerHTML = `<div class="empty">
+          <h3>本组完成</h3>
+          <p class="muted">本组 ${session.length} 题已结束。可以继续随机刷题，或切换到错题本复盘。</p>
+          <button type="button" class="primary" id="againBtn">再来一组</button>
+        </div>`;
+        $("#sessionBadge").textContent = "完成";
+        return;
+      }
+      index += 1;
+      checked = false;
+      selected = new Set();
+      render();
+    }
+
+    function escapeHtml(text) {
+      return String(text)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+    }
+
+    function renderParagraphs(text) {
+      return String(text)
+        .split(/\n{2,}/)
+        .map((line) => `<p>${escapeHtml(line)}</p>`)
+        .join("");
+    }
+
+    document.addEventListener("click", (event) => {
+      const categoryButton = event.target.closest("[data-category]");
+      if (categoryButton) {
+        const category = categoryButton.dataset.category;
+        if (selectedCategories.has(category)) selectedCategories.delete(category);
+        else selectedCategories.add(category);
+        renderCategories();
+        return;
+      }
+      if (event.target.closest("#startBtn")) startSession();
+      if (event.target.closest("#checkBtn")) checkCurrent();
+      if (event.target.closest("#nextBtn")) nextQuestion();
+      if (event.target.closest("#restartBtn")) startSession();
+      if (event.target.closest("#againBtn")) startSession();
+      if (event.target.closest("#toggleAllCategories")) {
+        selectedCategories = selectedCategories.size === categories.length ? new Set() : new Set(categories);
+        renderCategories();
+      }
+      if (event.target.closest("#resetStatsBtn")) {
+        if (window.confirm("确定清空累计作答和错题本吗？")) {
+          state = defaultState();
+          saveState();
+          render();
+          resetServerProgress();
+        }
+      }
+    });
+
+    document.addEventListener("change", (event) => {
+      if (!event.target.matches('input[name="answer"]')) return;
+      const value = Number(event.target.value);
+      const q = session[index];
+      if (!q || checked) return;
+      if (q.t === "single") selected = new Set([value]);
+      else if (event.target.checked) selected.add(value);
+      else selected.delete(value);
+      render();
+    });
+
+    render();
+    fetchServerProgress();
+  </script>
+</body>
+</html>
