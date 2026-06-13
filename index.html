@@ -454,10 +454,10 @@
         <div class="panel-title">刷题设置</div>
         <div class="controls">
           <select id="modeSelect" aria-label="刷题模式">
+            <option value="unpracticed" selected>继续新题（跳过已刷）</option>
             <option value="daily">今日 30 题</option>
             <option value="random50">随机 50 题</option>
             <option value="all">全量顺序</option>
-            <option value="unpracticed">只刷未刷题</option>
             <option value="wrong">只刷错题</option>
           </select>
           <div class="control-row">
@@ -468,7 +468,7 @@
             </select>
             <button type="button" id="toggleAllCategories">反选考点</button>
           </div>
-          <button type="button" class="primary" id="startBtn">开始本组</button>
+          <button type="button" class="primary" id="startBtn">按当前设置开始</button>
           <button type="button" class="danger" id="resetStatsBtn">清空本地记录</button>
         </div>
       </section>
@@ -498,6 +498,7 @@
   <script>
     const STORAGE_KEY = "deepseek-choice-practice-v1";
     const LETTERS = ["A", "B", "C", "D"];
+    const DEFAULT_MODE = "unpracticed";
     const BANK = [
       {id:1,t:"single",c:"概率统计与实验",q:"A/B 实验中随机分流最核心的目的是什么？",o:["让实验组用户更多","让实验组和对照组在统计意义上可比","让服务端缓存命中率更高","让样本量自动变大"],a:[1],e:"随机分流用于降低样本选择偏差，使实验组和对照组除实验变量外尽量一致。这样指标差异才更可能来自实验变量本身。"},
       {id:2,t:"multi",c:"概率统计与实验",q:"下列哪些会让 A/B 实验结论不可靠？",o:["只统计成功完成流程的用户","实验期间修改指标口径","实验组和对照组互相污染","样本随机分配失效"],a:[0,1,2,3],e:"这些都会破坏对照条件或统计口径。A/B 实验要关注随机化、样本量、指标定义、曝光口径和实验污染。"},
@@ -872,12 +873,13 @@
     async function fetchServerProgress() {
       try {
         const response = await fetch("/api/progress", { cache: "no-store" });
-        if (!response.ok) return;
+        if (!response.ok) return false;
         state = normalizeState(await response.json());
         saveState();
-        render();
+        return true;
       } catch {
         // Local state remains usable when the server-side store is unavailable.
+        return false;
       }
     }
 
@@ -971,6 +973,11 @@
       render();
     }
 
+    function startNewQuestionsSession() {
+      $("#modeSelect").value = DEFAULT_MODE;
+      startSession();
+    }
+
     function renderCategories() {
       $("#categoryList").innerHTML = categories.map((category) => {
         const count = BANK.filter((q) => q.c === category).length;
@@ -997,9 +1004,14 @@
       $("#sessionBadge").textContent = session.length ? `${index + 1}/${session.length}` : "未开始";
       $("#progressBar").style.width = session.length ? `${Math.round((index / session.length) * 100)}%` : "0%";
       if (!session.length) {
+        const mode = $("#modeSelect").value;
+        const emptyTitle = mode === "unpracticed" ? "当前筛选下没有未刷题" : "选择考点和模式后开始刷题";
+        const emptyText = mode === "unpracticed"
+          ? `当前题库 ${BANK.length} 题，已刷 ${state.practicedIds.length} 题。可以切到错题本或全量顺序复盘，或清空记录后重新刷。`
+          : `当前题库 ${BANK.length} 题，全部为单选或多选。服务端可用时会记录已刷题，浏览器本地记录作为兜底。`;
         area.innerHTML = `<div class="empty">
-          <h3>选择考点和模式后开始刷题</h3>
-          <p class="muted">当前题库 ${BANK.length} 题，全部为单选或多选。服务端可用时会记录已刷题，浏览器本地记录作为兜底。</p>
+          <h3>${emptyTitle}</h3>
+          <p class="muted">${emptyText}</p>
         </div>`;
         return;
       }
@@ -1181,8 +1193,14 @@
       render();
     });
 
-    render();
-    fetchServerProgress();
+    async function initialize() {
+      $("#modeSelect").value = DEFAULT_MODE;
+      render();
+      await fetchServerProgress();
+      startNewQuestionsSession();
+    }
+
+    initialize();
   </script>
 </body>
 </html>
