@@ -484,7 +484,7 @@
         <div class="topbar-main">
           <div>
             <h2>日常刷题模式</h2>
-            <div class="muted">覆盖概率统计、机器学习、大模型、RAG、Agent、OS、网络、移动端性能与工程安全。</div>
+            <div class="muted">覆盖概率统计、机器学习、大模型、RAG、Agent、OS、网络、Android 与移动端工程安全。</div>
           </div>
           <span class="badge" id="sessionBadge">未开始</span>
         </div>
@@ -614,7 +614,32 @@
       {id:105,t:"single",c:"移动端工程",q:"用户点击停止生成时，客户端最不应该做什么？",o:["只改按钮文案但不取消请求或忽略后续片段","更新 UI 状态","取消网络流","处理服务端后续片段"],a:[0],e:"停止生成是完整链路，需要 UI、网络、服务端和本地状态一致。"},
       {id:106,t:"multi",c:"移动端工程",q:"聊天页面长时间使用后越来越卡，可能原因包括哪些？",o:["文本布局缓存无限增长","列表复用不当","图片/附件内存峰值","首 token 太快"],a:[0,1,2],e:"首 token 太快不是卡顿原因。长会话要重点看 UI、内存和缓存。"},
       {id:107,t:"single",c:"移动端工程",q:"本地持久化适合处理什么？",o:["离线可用或跨启动保存的数据","每帧临时绘制状态","所有 access token 明文","无限增长日志"],a:[0],e:"持久化要考虑加密、容量、迁移和失效策略。"},
-      {id:108,t:"multi",c:"移动端工程",q:"移动端接入大模型能力时，RD 需要理解哪些系统问题？",o:["网络弱网和取消","UI 增量渲染","模型基础延迟来源","隐私和日志边界"],a:[0,1,2,3],e:"移动端 AI 体验是端到端系统问题，不只是调用一个接口。"}
+      {id:108,t:"multi",c:"移动端工程",q:"移动端接入大模型能力时，RD 需要理解哪些系统问题？",o:["网络弱网和取消","UI 增量渲染","模型基础延迟来源","隐私和日志边界"],a:[0,1,2,3],e:"移动端 AI 体验是端到端系统问题，不只是调用一个接口。"},
+
+      {id:109,t:"single",c:"Android 开发基础",q:"Android 四大组件通常指哪些？",o:["Activity、Service、BroadcastReceiver、ContentProvider","Activity、Application、Fragment、ViewModel","View、Window、Dialog、Toast","Gradle、Manifest、R8、ADB"],a:[0],e:"四大组件是 Android 应用与系统交互的基础入口。Application、Fragment、ViewModel 很重要，但不属于传统四大组件。"},
+      {id:110,t:"multi",c:"Android 开发基础",q:"下列哪些属于 Activity 常见生命周期回调？",o:["onCreate","onStart","onResume","onLaunch"],a:[0,1,2],e:"Activity 常见生命周期包括 onCreate、onStart、onResume、onPause、onStop、onDestroy 等。onLaunch 不是 Activity 生命周期回调。"},
+      {id:111,t:"single",c:"Android 开发基础",q:"onSaveInstanceState 更适合保存什么？",o:["配置变更或进程回收后恢复所需的轻量 UI 状态","大尺寸 Bitmap 和数据库连接","替代 ViewModel 保存全部业务状态","每次进入后台都必须提交的核心交易数据"],a:[0],e:"onSaveInstanceState 面向可序列化、轻量、可恢复的 UI 状态。大量对象、连接和关键业务持久化应放到更合适的数据层或生命周期组件中。"},
+      {id:112,t:"multi",c:"Android 开发基础",q:"避免 Activity 泄漏可以采用哪些做法？",o:["长生命周期对象避免强持有 Activity 引用","不再需要时移除 Handler 回调或监听器","需要全局 Context 时优先使用 applicationContext","把当前 Activity 放进单例方便任意页面访问"],a:[0,1,2],e:"泄漏常来自长生命周期对象持有短生命周期对象。单例强持有 Activity 会阻止 Activity 释放，是常见泄漏来源。"},
+      {id:113,t:"single",c:"Android 开发基础",q:"Handler 发送到某线程的 Message 最终通常由谁取出并分发？",o:["该线程的 Looper 从 MessageQueue 取出并交给 Handler 分发","系统线程池随机选择空闲线程执行","GC 在回收对象前统一分发","Binder 驱动直接调用 View.draw"],a:[0],e:"Looper 在线程内循环读取 MessageQueue，取出消息后调用目标 Handler 的分发逻辑。Handler 不会自动创建后台线程。"},
+      {id:114,t:"multi",c:"Android 开发基础",q:"哪些操作通常应避免直接放在 Android 主线程执行？",o:["同步网络请求","大文件读写","大图解码或重 CPU 计算","一次简单 TextView 文案更新"],a:[0,1,2],e:"主线程负责输入、生命周期和 UI 绘制，耗时 IO 或 CPU 任务会造成卡顿甚至 ANR。简单 UI 更新应在主线程完成。"},
+      {id:115,t:"single",c:"Android 开发基础",q:"ANR 的本质原因通常是什么？",o:["主线程或关键组件长时间无法及时处理系统要求的事件","应用包体超过应用商店推荐大小","RecyclerView 没有设置固定高度","SharedPreferences 使用了 apply"],a:[0],e:"ANR 是系统认为应用在输入、广播、服务等关键路径上长时间无响应。排查要看主线程堆栈、锁等待、IO、Binder 调用和 CPU 占用。"},
+      {id:116,t:"multi",c:"Android 开发基础",q:"提升 RecyclerView 列表性能通常可以做哪些优化？",o:["利用 ViewHolder 复用机制","使用 DiffUtil/ListAdapter 做局部更新","避免在 onBindViewHolder 中做重 IO 或复杂计算","任何数据变化都调用 notifyDataSetChanged"],a:[0,1,2],e:"列表性能重点在复用、局部刷新和绑定轻量化。全量 notifyDataSetChanged 会丢失精细 diff 信息，容易引起不必要的重绘和动画缺失。"},
+      {id:117,t:"single",c:"Android 开发基础",q:"DiffUtil 的核心价值是什么？",o:["计算新旧列表差异，驱动 RecyclerView 做局部更新","把网络请求自动切到 IO 线程","把 Bitmap 自动压缩成 WebP","替代所有 ViewHolder 绑定逻辑"],a:[0],e:"DiffUtil 比较 item 是否相同、内容是否变化，从而减少全量刷新。它不负责线程调度、图片压缩或业务绑定本身。"},
+      {id:118,t:"multi",c:"Android 开发基础",q:"Android View 绘制链路通常包括哪些阶段？",o:["measure","layout","draw","install"],a:[0,1,2],e:"View 从测量、布局到绘制形成基本渲染链路。install 不是 View 绘制阶段。"},
+      {id:119,t:"single",c:"Android 开发基础",q:"requestLayout 和 invalidate 的区别更准确的是？",o:["尺寸或位置可能变化用 requestLayout，只需重绘内容用 invalidate","invalidate 会重新执行 measure/layout，requestLayout 只重绘像素","二者完全等价，只是命名不同","二者都会立即同步完成整棵 View 树绘制"],a:[0],e:"requestLayout 表示布局可能失效，通常会触发后续 measure/layout/draw；invalidate 主要标记需要重绘。实际执行由 Choreographer 等机制调度，不是立刻同步完成。"},
+      {id:120,t:"multi",c:"Android 开发基础",q:"使用 Jetpack Lifecycle 时，哪些做法更合理？",o:["按生命周期启动和停止数据收集","Fragment 观察 View 相关数据时使用 viewLifecycleOwner","页面销毁时清理不再需要的监听器","在 onCreate 中启动不可取消的无限轮询"],a:[0,1,2],e:"Lifecycle 的价值是让资源使用和页面状态对齐。不可取消的轮询容易泄漏并浪费资源。"},
+      {id:121,t:"single",c:"Android 开发基础",q:"Fragment 中观察 View 相关 LiveData/Flow 时常用 viewLifecycleOwner 的主要原因是？",o:["让观察者生命周期跟随 Fragment 的 View，避免 View 销毁后仍回调","让 Fragment 生命周期比 Activity 更长","让 LiveData 自动变成冷流","让所有回调都切到 IO 线程"],a:[0],e:"Fragment 实例生命周期和它的 View 生命周期并不完全一致。使用 viewLifecycleOwner 可避免 View 销毁后继续访问旧 View 引发崩溃或泄漏。"},
+      {id:122,t:"multi",c:"Android 开发基础",q:"关于 Kotlin Coroutine 在 Android 中的使用，哪些说法更合理？",o:["UI 更新通常回到 Dispatchers.Main","阻塞 IO 适合放到 Dispatchers.IO","结构化并发有助于生命周期取消","GlobalScope 默认会随 Activity 销毁自动取消"],a:[0,1,2],e:"协程要绑定合适的 Scope 和 Dispatcher。GlobalScope 不跟随页面生命周期，滥用会导致泄漏、后台任务失控或结果回调到已销毁页面。"},
+      {id:123,t:"single",c:"Android 开发基础",q:"repeatOnLifecycle 常用于解决什么问题？",o:["在指定生命周期状态内收集数据，停止时自动取消并在恢复时重启","把所有 Flow 转换成同步阻塞调用","让协程忽略 Activity 销毁继续执行","保证每个事件只发送一次"],a:[0],e:"repeatOnLifecycle 常用于按 STARTED/RESUMED 等状态安全收集 Flow，避免不可见时仍然消耗资源或更新已销毁的 UI。"},
+      {id:124,t:"multi",c:"Android 开发基础",q:"使用 Room/SQLite 时应关注哪些点？",o:["避免在主线程做耗时数据库操作","设计迁移策略","使用事务保证一组写入的一致性","用字符串拼接用户输入生成 SQL"],a:[0,1,2],e:"数据库操作要关注线程、事务、迁移和注入风险。用户输入应使用参数化查询或 DAO 能力处理，避免 SQL 注入和转义错误。"},
+      {id:125,t:"single",c:"Android 开发基础",q:"DataStore 相比传统 SharedPreferences 的一个重要优势是？",o:["基于异步 API，更适合避免主线程阻塞和一致性问题","自动加密所有数据且无需任何密钥管理","可以直接存储任意 Activity 对象","会自动同步到服务端数据库"],a:[0],e:"DataStore 提供基于协程/Flow 的异步数据访问方式，并改善一致性。它不是自动加密或云同步方案。"},
+      {id:126,t:"multi",c:"Android 开发基础",q:"WorkManager 更适合处理哪些后台任务？",o:["可延迟但需要较可靠执行的任务","需要网络或充电等约束的任务","失败后可重试并带退避策略的任务","每一帧都必须执行的 UI 动画"],a:[0,1,2],e:"WorkManager 适合可延迟、可约束、需要可靠调度的后台工作。高频 UI 动画属于前台渲染流程，不适合用 WorkManager。"},
+      {id:127,t:"single",c:"Android 开发基础",q:"Foreground Service 更适合什么场景？",o:["用户可感知、需要持续运行且通常要展示通知的任务","任何短小计算都强制放到前台服务","替代 Activity 展示所有 UI","绕过系统后台限制执行隐蔽任务"],a:[0],e:"前台服务用于用户明确感知的持续任务，例如导航、音频、上传下载等。它不是规避后台限制的通用入口。"},
+      {id:128,t:"multi",c:"Android 开发基础",q:"关于 Android 文件与存储，哪些说法更合理？",o:["应用专属目录通常适合保存本应用私有文件","共享媒体优先通过 MediaStore 或系统选择器访问","不要依赖硬编码外部存储绝对路径","声明 INTERNET 权限后即可读写所有外部文件"],a:[0,1,2],e:"Android 存储要区分应用私有目录、共享媒体和用户选择的文档。网络权限和文件访问权限不是一回事，硬编码外部路径也不可靠。"},
+      {id:129,t:"single",c:"Android 开发基础",q:"PendingIntent 的 mutability 选择更合理的是？",o:["不需要外部修改内容时用 immutable，确实需要填充或修改时才用 mutable","所有 PendingIntent 都应设为 mutable 方便扩展","所有 PendingIntent 都应设为 immutable，否则系统无法发送","mutability 只影响 UI 颜色，不影响安全边界"],a:[0],e:"PendingIntent 代表未来由他方触发的操作，mutability 会影响外部能否修改其中 Intent 内容。默认倾向不可变，只有明确需要时才开放可变。"},
+      {id:130,t:"multi",c:"Android 开发基础",q:"R8/ProGuard 在 Android 构建中通常能做什么？",o:["代码压缩","混淆","优化","提升应用运行时权限"],a:[0,1,2],e:"R8/ProGuard 可做 shrink、obfuscate、optimize，但不会改变应用权限。反射、序列化、JNI、路由等场景需要合理 keep 规则。"},
+      {id:131,t:"single",c:"Android 开发基础",q:"APK/AAB 签名的主要价值是什么？",o:["证明应用发布者身份并保证包完整性，支持安全升级链路","减少所有运行时崩溃","让 HTTP 请求自动走 HTTPS","让数据库迁移自动完成"],a:[0],e:"签名用于校验安装包来源和完整性，也是同一应用升级、权限和平台信任关系的重要基础。"},
+      {id:132,t:"multi",c:"Android 开发基础",q:"关于 Jetpack Compose 状态与重组，哪些说法更合理？",o:["状态变化会驱动相关 UI 重组","remember 可在重组间保留对象","rememberSaveable 可保存适合 Bundle 的简单状态","在每次重组时无条件修改状态是推荐写法"],a:[0,1,2],e:"Compose 是声明式 UI，状态驱动界面。无条件在重组中修改状态可能造成重复重组甚至循环，应把副作用放到合适的 effect API 中。"}
     ];
 
     const SINGLE_OPTION_OVERRIDES = {
@@ -674,7 +699,19 @@
       101:["违反 UI 线程模型，可能崩溃或行为异常","只会导致布局多一次，不会有线程问题","一定被系统自动切回主线程","只影响低版本 Android"],
       103:["16.67ms","8.33ms","33.33ms","100ms"],
       105:["只改按钮文案但不取消请求或忽略后续片段","更新 UI 状态","取消网络流","处理服务端后续片段"],
-      107:["离线可用或跨启动保存的数据","一次绘制周期内的 UI 临时状态","明文保存所有 token 便于恢复","无限追加调试日志不做清理"]
+      107:["离线可用或跨启动保存的数据","一次绘制周期内的 UI 临时状态","明文保存所有 token 便于恢复","无限追加调试日志不做清理"],
+      109:["Activity、Service、BroadcastReceiver、ContentProvider","Activity、Application、Fragment、ViewModel","View、Window、Dialog、Toast","Gradle、Manifest、R8、ADB"],
+      111:["配置变更或进程回收后恢复所需的轻量 UI 状态","大尺寸 Bitmap 和数据库连接","替代 ViewModel 保存全部业务状态","每次进入后台都必须提交的核心交易数据"],
+      113:["该线程的 Looper 从 MessageQueue 取出并交给 Handler 分发","系统线程池随机选择空闲线程执行","GC 在回收对象前统一分发","Binder 驱动直接调用 View.draw"],
+      115:["主线程或关键组件长时间无法及时处理系统要求的事件","应用包体超过应用商店推荐大小","RecyclerView 没有设置固定高度","SharedPreferences 使用了 apply"],
+      117:["计算新旧列表差异，驱动 RecyclerView 做局部更新","把网络请求自动切到 IO 线程","把 Bitmap 自动压缩成 WebP","替代所有 ViewHolder 绑定逻辑"],
+      119:["尺寸或位置可能变化用 requestLayout，只需重绘内容用 invalidate","invalidate 会重新执行 measure/layout，requestLayout 只重绘像素","二者完全等价，只是命名不同","二者都会立即同步完成整棵 View 树绘制"],
+      121:["让观察者生命周期跟随 Fragment 的 View，避免 View 销毁后仍回调","让 Fragment 生命周期比 Activity 更长","让 LiveData 自动变成冷流","让所有回调都切到 IO 线程"],
+      123:["在指定生命周期状态内收集数据，停止时自动取消并在恢复时重启","把所有 Flow 转换成同步阻塞调用","让协程忽略 Activity 销毁继续执行","保证每个事件只发送一次"],
+      125:["基于异步 API，更适合避免主线程阻塞和一致性问题","自动加密所有数据且无需任何密钥管理","可以直接存储任意 Activity 对象","会自动同步到服务端数据库"],
+      127:["用户可感知、需要持续运行且通常要展示通知的任务","任何短小计算都强制放到前台服务","替代 Activity 展示所有 UI","绕过系统后台限制执行隐蔽任务"],
+      129:["不需要外部修改内容时用 immutable，确实需要填充或修改时才用 mutable","所有 PendingIntent 都应设为 mutable 方便扩展","所有 PendingIntent 都应设为 immutable，否则系统无法发送","mutability 只影响 UI 颜色，不影响安全边界"],
+      131:["证明应用发布者身份并保证包完整性，支持安全升级链路","减少所有运行时崩溃","让 HTTP 请求自动走 HTTPS","让数据库迁移自动完成"]
     };
 
     for (const question of BANK) {
@@ -692,6 +729,7 @@
       "Agent 工程": "相关知识：Agent 工程关注模型如何规划、调用工具、观察结果并继续完成任务。重点掌握 tool calling、allowlist、参数 schema、observation、ReAct、最大步数/成本、循环检测、失败降级、记忆管理、权限分级和审计日志。移动端接入 Agent 时还要处理弱网、取消、前后台切换、进度反馈和用户确认。",
       "OS/并发/计组": "相关知识：系统基础直接影响移动端稳定性和性能。重点掌握进程/线程、上下文切换、虚拟内存、page fault、CPU cache、死锁条件、数据竞争、内存可见性、锁、原子操作、LRU、文件描述符和内存泄漏。很多卡顿、ANR、OOM、长尾延迟问题本质上都是系统资源和并发调度问题。",
       "网络/缓存/安全": "相关知识：网络链路决定 AI 应用的可用性和弱网体验。重点掌握 DNS、TCP、TLS、HTTP/2、HTTP 缓存、ETag、SSE、429 限流、超时、重试、幂等、退避、证书校验、token 安全和日志脱敏。大模型流式输出要特别关注首 token、分片间隔、取消、断线恢复和服务端错误终态。",
+      "Android 开发基础": "相关知识：Android 基础面试通常围绕组件生命周期、主线程模型、Handler/Looper、View 绘制、列表性能、协程与 Lifecycle、数据持久化、后台任务、存储权限、构建签名和内存泄漏展开。移动端 RD 要能把 API 用法和工程后果连起来：哪些操作会卡主线程、哪些对象会泄漏、哪些后台任务会被系统限制、哪些数据需要安全持久化。",
       "移动端工程": "相关知识：移动端工程把模型能力变成可用产品体验。重点掌握 Android Looper/Handler、iOS RunLoop/ARC、生命周期、主线程帧预算、列表复用、文本排版、图片解码、内存分析、崩溃率、ANR、冷启动、弱网状态机、缓存和本地持久化。移动端 AI 场景还要处理流式增量渲染、停止生成、长会话性能和隐私边界。"
     };
 
@@ -704,6 +742,7 @@
       {re:/Agent|tool|工具|ReAct|dispatcher|observation|循环|记忆|规划|降级|权限|进度/,text:"题目级知识：Agent 题重点看工具调用闭环和安全边界。模型提出 action，系统校验并执行工具，再把 observation 返回模型；工程上必须设置 allowlist、schema、最大步数、成本预算、循环检测和失败降级。"},
       {re:/CPU cache|死锁|线程|进程|虚拟内存|数据竞争|可见性|主线程|LRU|文件描述符|heap|内存|锁|ANR/,text:"题目级知识：系统题要理解资源和并发。死锁四条件是互斥、持有并等待、不可抢占、循环等待；LRU 常用哈希表加双向链表；主线程 CPU 密集任务、锁等待和内存泄漏都会造成移动端卡顿或稳定性问题。"},
       {re:/HTTP|ETag|Cache-Control|HTTP\/2|重试|弱网|429|证书|SSE|流式响应|TCP|DNS|token|网络诊断/,text:"题目级知识：网络题要按端到端链路拆 DNS、TCP、TLS、TTFB、下载和业务状态。缓存看 Cache-Control/ETag/Last-Modified；弱网重试要考虑幂等、退避、最大次数；SSE 常用于 LLM 文本流式输出。"},
+      {re:/Activity|Fragment|Service|BroadcastReceiver|ContentProvider|Handler|Looper|MessageQueue|ANR|RecyclerView|DiffUtil|ViewHolder|requestLayout|invalidate|Lifecycle|viewLifecycleOwner|Coroutine|Dispatchers|repeatOnLifecycle|Room|SQLite|DataStore|WorkManager|Foreground Service|PendingIntent|R8|ProGuard|APK|AAB|Compose|remember/,text:"题目级知识：Android 基础题要把平台机制和生命周期绑定起来。Activity/Fragment 有各自生命周期，主线程通过 Looper/MessageQueue 处理消息，View 渲染按 measure/layout/draw 推进；协程、Flow、数据库、后台任务和列表刷新都要遵守生命周期、线程和资源约束。"},
       {re:/Android|Looper|Handler|iOS|ARC|View|60 FPS|滚动|文本|生命周期|停止生成|持久化|冷启动|列表/,text:"题目级知识：移动端工程题要把主线程模型、生命周期、弱网状态机和 UI 渲染成本连起来。60 FPS 单帧预算约 16.67ms，流式文本追加要节流、批量刷新和异步排版，停止生成要同时处理 UI、网络和服务端状态。"}
     ];
 
